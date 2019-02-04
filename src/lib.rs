@@ -29,6 +29,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //!  * Remember the prior index of an element after sorting.
 //!  * Undo a sort.
 //!  * Compare the orderings of elements.
-
+#![feature(vec_resize_default)]
 pub mod permutation;
 pub use permutation::*;

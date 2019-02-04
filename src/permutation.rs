@@ -280,6 +280,26 @@ impl Permutation {
         }
     }
 
+    pub fn apply_vec<T>(&self, vec: &mut Vec<T>) {
+        assert!(vec.len() == self.len());
+        let mut v = vec![];
+        v.resize_default(vec.len());
+        for (i, el) in vec.drain(..).enumerate() {
+            if self.inv {
+                v[self.indices[i]] = Some(el);
+            } else {
+                v[i] = Some(el);
+            }
+        }
+        for (i, p) in self.indices.iter().cloned().enumerate() {
+            if self.inv {
+                vec.push(v[i].take().unwrap());
+            } else {
+                vec.push(v[p].take().unwrap());
+            }
+        }
+    }
+
     /// Apply the inverse of a permutation to a slice of elements
     ///
     /// Given a slice of elements, this will permute the elements in place according
@@ -392,6 +412,16 @@ pub fn sort_by_key<T, D, B, F>(vec: D, mut f: F) -> Permutation
     return permutation;
 }
 
+pub fn by_key<B, F>(len: usize, mut f: F) -> Permutation
+    where B: Ord,
+          F: FnMut(&usize) -> B
+{
+    let mut permutation = Permutation::one(len);
+    //We use the reverse permutation form, because its more efficient for applying to indices.
+    permutation.indices.sort_by_key(f);
+    return permutation;
+}
+
 #[cfg(test)]
 mod tests {
     use permutation;
@@ -418,6 +448,17 @@ mod tests {
         assert!(square == id);
         let cube = &p1 * &square;
         assert!(cube == p1);
+    }
+
+    #[test]
+    fn apply_vec() {
+        use super::sort;
+        let v = vec![1, 0, 2];
+        let p = sort(v.as_slice());
+        let cloned = p.apply_slice(v.as_slice());
+        let mut v = v;
+        p.apply_vec(&mut v);
+        assert!(v == cloned);
     }
     #[test]
     fn prod() {
