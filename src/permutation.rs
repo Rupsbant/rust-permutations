@@ -188,9 +188,13 @@ impl Permutation {
             } else {
                 (&self.inverse() * &Permutation::one(len)).inverse()
             }
-
         }
     }
+
+    pub fn as_vec(self) -> Vec<usize> {
+        self.normalize(true).indices
+    }
+
     fn apply_idx_fwd(&self, idx: usize) -> usize {
         self.indices
             .iter()
