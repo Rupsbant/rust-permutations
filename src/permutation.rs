@@ -287,7 +287,7 @@ impl Permutation {
     pub fn apply_vec<T>(&self, vec: &mut Vec<T>) {
         assert!(vec.len() == self.len());
         let mut v = vec![];
-        v.resize_default(vec.len());
+        v.resize_with(vec.len(), Default::default);
         for (i, el) in vec.drain(..).enumerate() {
             if self.inv {
                 v[self.indices[i]] = Some(el);
@@ -416,7 +416,7 @@ pub fn sort_by_key<T, D, B, F>(vec: D, mut f: F) -> Permutation
     return permutation;
 }
 
-pub fn by_key<B, F>(len: usize, mut f: F) -> Permutation
+pub fn by_key<B, F>(len: usize, f: F) -> Permutation
     where B: Ord,
           F: FnMut(&usize) -> B
 {
